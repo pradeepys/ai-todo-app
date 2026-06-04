@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Galaxy OS — The Ultimate Productivity Universe</title>
+  <meta name="description" content="A futuristic, gamified, space-themed personal operating system and task manager built on vanilla HTML, CSS, and JS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <!-- Custom Cursor Elements -->
+  <div id="custom-cursor" aria-hidden="true"></div>
+  <div id="custom-cursor-glow" aria-hidden="true"></div>
+
+  <!-- Cosmic Background Layers -->
+  <div class="galaxy-background">
+    <div class="bg-layer gradient-mesh"></div>
+    <div class="bg-layer aurora-drift"></div>
+    <canvas id="space-canvas"></canvas>
+    <div class="bg-layer depth-lighting"></div>
+    <div class="bg-layer scanline-overlay"></div>
+  </div>
+
+  <!-- Startup Boot Splash Screen -->
+  <div id="splash-screen" class="splash-container">
+    <div class="splash-box">
+      <div class="splash-logo">
+        <svg viewBox="0 0 100 100" class="orbit-logo">
+          <circle cx="50" cy="50" r="40" stroke="var(--primary)" stroke-width="2" fill="none" stroke-dasharray="250" />
+          <circle cx="50" cy="50" r="20" stroke="var(--accent)" stroke-width="1.5" fill="none" stroke-dasharray="100" />
+          <circle cx="50" cy="10" r="6" fill="var(--primary-glow)" class="orbiting-dot" />
+          <circle cx="50" cy="30" r="4" fill="var(--accent-glow)" class="orbiting-dot-inner" />
+          <polygon points="50,40 58,58 42,58" fill="var(--primary)" />
+        </svg>
+      </div>
+      <h1 class="splash-title">TASK GALAXY OS</h1>
+      <p class="splash-subtitle">Initializing Digital Universe...</p>
+      
+      <div class="boot-terminal">
+        <div class="terminal-line" data-delay="300">> Loading cosmic gravity modules... [OK]</div>
+        <div class="terminal-line" data-delay="700">> Initializing localized state systems... [OK]</div>
+        <div class="terminal-line" data-delay="1100">> Activating synthesized soundscape node... [OK]</div>
+        <div class="terminal-line" data-delay="1500">> Syncing user level milestones... [OK]</div>
+        <div class="terminal-line" data-delay="1800">> System status: ONLINE. Engaging warp drive...</div>
+      </div>
+      
+      <div class="boot-progress-bar">
+        <div class="boot-progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main System UI Wrapper -->
+  <div id="app-shell" class="app-layout hidden">
+    
+    <!-- Left Navigation Panel (Aether Deck) -->
+    <aside class="aether-deck" aria-label="Main Navigation & Stats">
+      <div class="deck-header">
+        <div class="system-title-container">
+          <div class="live-core"></div>
+          <span class="system-name">GALAXY OS</span>
+          <span class="system-ver">v1.2.0</span>
+        </div>
+        
+        <!-- User Profile Card (RPG Gamification Dashboard) -->
+        <div class="profile-card">
+          <div class="avatar-ring">
+            <svg class="progress-ring-xp" width="64" height="64">
+              <circle class="progress-ring-circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="4" fill="transparent" r="28" cx="32" cy="32"/>
+              <circle id="xp-progress-ring" class="progress-ring-circle" stroke="var(--primary)" stroke-width="4" fill="transparent" r="28" cx="32" cy="32"/>
+            </svg>
+            <div class="avatar-face" id="profile-avatar">✨</div>
+          </div>
+          <div class="profile-details">
+            <span class="profile-rank" id="profile-rank">EXPLORER</span>
+            <span class="profile-level">Level <span id="profile-level-val">1</span></span>
+            <div class="xp-tooltip"><span id="xp-current-val">0</span> / <span id="xp-max-val">100</span> XP</div>
+          </div>
+        </div>
+
+        <div class="currency-bar">
+          <div class="gold-balance" title="Aether Gold - complete tasks to earn!">
+            <span class="coin-spin">🪙</span> <span id="gold-val">500</span>g
+          </div>
+          <div class="streak-badge" title="Daily Streak Tracker">
+            <span class="streak-fire">🔥</span> <span id="streak-val">0</span> days
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Navigation Menu -->
+      <nav class="deck-nav">
+        <span class="deck-section-label">Dimensions</span>
+        <ul class="nav-links">
+          <li>
+            <button class="nav-btn active" data-view="list" id="nav-btn-list">
+              <span class="btn-icon">📋</span> List Dimension
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="grid" id="nav-btn-grid">
+              <span class="btn-icon">🗂️</span> Galaxy Cards
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="kanban" id="nav-btn-kanban">
+              <span class="btn-icon">📊</span> Kanban Field
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="timeline" id="nav-btn-timeline">
+              <span class="btn-icon">⏳</span> Chronos Timeline
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-view="calendar" id="nav-btn-calendar">
+              <span class="btn-icon">📅</span> Star Calendar
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Category Filter Panel -->
+      <div class="deck-categories">
+        <div class="category-header">
+          <span class="deck-section-label">Categories</span>
+          <button id="add-cat-btn" class="icon-btn-small" aria-label="Add Category" title="Create Custom Category">+</button>
+        </div>
+        <ul class="category-list" id="sidebar-categories">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+
+      <!-- Quick Utility Panel -->
+      <div class="deck-footer">
+        <button id="open-shop-btn" class="footer-btn">
+          <span class="btn-icon">🪙</span> Aether Store
+        </button>
+        <button id="open-theme-btn" class="footer-btn">
+          <span class="btn-icon">🎨</span> Customize Theme
+        </button>
+        <button id="toggle-audio-btn" class="footer-btn sound-active">
+          <span class="btn-icon" id="sound-icon">🔊</span> Synthesizer
+        </button>
+      </div>
+    </aside>
+
+    <!-- Right Space/Workspace Panel -->
+    <main class="space-viewport">
+      
+      <!-- Top Control & Status Bar -->
+      <header class="hud-bar">
+        <div class="hud-search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search tasks, categories, or priority tags..." aria-label="Search items">
+          <span class="keyboard-hint">⌘K</span>
+        </div>
+        
+        <div class="hud-controls">
+          <div class="sort-selector-wrapper">
+            <span class="sort-icon">⇅</span>
+            <select id="sort-select" aria-label="Sort Tasks">
+              <option value="creation">Date Created</option>
+              <option value="due">Due Date</option>
+              <option value="priority">Priority Tier</option>
+              <option value="alphabetical">Alphabetical</option>
+              <option value="completion">Completion Status</option>
+            </select>
+          </div>
+
+          <button id="focus-mode-toggle" class="hud-btn" title="Focus Dimension (Distraction-Free Mode)">
+            <span>👁️ Focus</span>
+          </button>
+
+          <button id="pomodoro-toggle" class="hud-btn pomodoro-trigger" title="Toggle Focus Timer">
+            <span class="pomo-pulse-dot"></span>
+            <span id="pomo-hud-time">25:00</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Dynamic View Container -->
+      <section class="content-field" id="view-container">
+        
+        <!-- ================= LIST VIEW ================= -->
+        <div class="view-panel" id="view-list">
+          <div class="list-workspace">
+            <div class="workspace-header">
+              <h2>List Dimension</h2>
+              <button class="primary-btn launch-task-creator"><span>+ Add Nebula Task</span></button>
+            </div>
+            
+            <div class="task-sections-container">
+              <!-- Active Tasks Column -->
+              <div class="task-block">
+                <div class="block-header">
+                  <span class="header-indicator active"></span>
+                  <h3>Active Anomalies</h3>
+                  <span class="count-badge" id="active-tasks-count">0</span>
+                </div>
+                <div class="task-list-drag" id="active-tasks-container">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+
+              <!-- Completed Tasks Column -->
+              <div class="task-block completed-block">
+                <div class="block-header">
+                  <span class="header-indicator completed"></span>
+                  <h3>Solidified Stars (Completed)</h3>
+                  <span class="count-badge" id="completed-tasks-count">0</span>
+                </div>
+                <div class="task-list-drag" id="completed-tasks-container">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= GRID CARD VIEW ================= -->
+        <div class="view-panel hidden" id="view-grid">
+          <div class="grid-workspace">
+            <div class="workspace-header">
+              <h2>Galaxy Cards</h2>
+              <button class="primary-btn launch-task-creator"><span>+ Add Nebula Task</span></button>
+            </div>
+            <div class="grid-layout-container" id="grid-tasks-container">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= KANBAN BOARD VIEW ================= -->
+        <div class="view-panel hidden" id="view-kanban">
+          <div class="kanban-workspace">
+            <div class="workspace-header">
+              <h2>Kanban Field</h2>
+              <button class="primary-btn launch-task-creator"><span>+ Add Nebula Task</span></button>
+            </div>
+            <div class="kanban-board-container">
+              <!-- Todo Column -->
+              <div class="kanban-col" data-status="todo">
+                <div class="kanban-col-header font-orbit">
+                  <span>🌌</span> Todo Orbit <span class="col-count" id="kanban-todo-count">0</span>
+                </div>
+                <div class="kanban-dropzone" id="kanban-todo-list"></div>
+              </div>
+              
+              <!-- In Progress Column -->
+              <div class="kanban-col" data-status="progress">
+                <div class="kanban-col-header font-orbit">
+                  <span>⚡</span> In Expansion <span class="col-count" id="kanban-progress-count">0</span>
+                </div>
+                <div class="kanban-dropzone" id="kanban-progress-list"></div>
+              </div>
+
+              <!-- Done Column -->
+              <div class="kanban-col" data-status="done">
+                <div class="kanban-col-header font-orbit">
+                  <span>✨</span> Solid Stars <span class="col-count" id="kanban-done-count">0</span>
+                </div>
+                <div class="kanban-dropzone" id="kanban-done-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TIMELINE VIEW ================= -->
+        <div class="view-panel hidden" id="view-timeline">
+          <div class="timeline-workspace">
+            <div class="workspace-header">
+              <h2>Chronos Timeline</h2>
+              <button class="primary-btn launch-task-creator"><span>+ Add Nebula Task</span></button>
+            </div>
+            <div class="timeline-scroll-area">
+              <div class="timeline-axis"></div>
+              <div class="timeline-nodes-container" id="timeline-container">
+                <!-- Sorted chronologically by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= CALENDAR VIEW ================= -->
+        <div class="view-panel hidden" id="view-calendar">
+          <div class="calendar-workspace">
+            <div class="workspace-header">
+              <div class="calendar-nav-wrap">
+                <h2>Star Calendar</h2>
+                <div class="cal-nav-buttons">
+                  <button id="cal-prev-month" class="hud-btn-mini">&lt;</button>
+                  <span id="cal-month-year-label" class="cal-label">June 2026</span>
+                  <button id="cal-next-month" class="hud-btn-mini">&gt;</button>
+                </div>
+              </div>
+              <button class="primary-btn launch-task-creator"><span>+ Add Nebula Task</span></button>
+            </div>
+            <div class="calendar-grid">
+              <div class="calendar-week-days">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+              <div class="calendar-days-container" id="calendar-days-grid">
+                <!-- Days will be generated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Productivity Dashboard panel (Foldable panel at the bottom) -->
+      <footer class="hud-dashboard-drawer">
+        <div class="drawer-header" id="dashboard-toggle-trigger">
+          <div class="drawer-title">
+            <span>📈</span> Productivity Command Dashboard
+          </div>
+          <div class="drawer-stats-summary">
+            <span>Success Rate: <strong id="dash-success-rate">0%</strong></span>
+            <span>Completed: <strong id="dash-completed-count">0/0</strong></span>
+            <span class="drawer-chevron">▲</span>
+          </div>
+        </div>
+        <div class="drawer-content hidden" id="dashboard-drawer-panel">
+          <div class="dashboard-grid">
+            
+            <!-- Overall Stats Mini Panel -->
+            <div class="dash-widget glass-box">
+              <h3>System Matrix</h3>
+              <div class="widget-row">
+                <div class="stat-entry">
+                  <div class="stat-label">Productivity Rating</div>
+                  <div class="stat-value text-glow-cyan" id="dash-matrix-score">0</div>
+                </div>
+                <div class="stat-entry">
+                  <div class="stat-label">Consecutive Days</div>
+                  <div class="stat-value text-glow-gold" id="dash-matrix-streak">0</div>
+                </div>
+              </div>
+              <div class="widget-row">
+                <div class="stat-entry">
+                  <div class="stat-label">Total Expansions</div>
+                  <div class="stat-value" id="dash-matrix-total">0</div>
+                </div>
+                <div class="stat-entry">
+                  <div class="stat-label">Active Anomalies</div>
+                  <div class="stat-value" id="dash-matrix-active">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Activity Heatmap -->
+            <div class="dash-widget glass-box heatmap-widget">
+              <h3>Chronos Activity Density</h3>
+              <div class="heatmap-container" id="activity-heatmap">
+                <!-- 52 weeks SVG contributions grid generated by JS -->
+              </div>
+            </div>
+
+            <!-- Category Analysis Canvas Chart -->
+            <div class="dash-widget glass-box chart-widget">
+              <h3>Energy Distribution (Categories)</h3>
+              <div class="chart-canvas-container">
+                <canvas id="category-radar-chart" width="220" height="220"></canvas>
+              </div>
+            </div>
+
+            <!-- Achievements Display -->
+            <div class="dash-widget glass-box achievements-widget">
+              <h3>Unlocked Stellar Achievements</h3>
+              <div class="achievements-scroll" id="achievements-container">
+                <!-- Achievements list generated by JS -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </footer>
+
+      <!-- Mobile Bottom Navigation (Virtual HUD) -->
+      <nav class="aether-deck-mobile-nav" aria-label="Mobile Navigation">
+        <button class="mob-nav-btn active" data-view="list">
+          <span>📋</span>
+          <span>List</span>
+        </button>
+        <button class="mob-nav-btn" data-view="grid">
+          <span>🗂️</span>
+          <span>Cards</span>
+        </button>
+        <button class="mob-nav-btn" data-view="kanban">
+          <span>📊</span>
+          <span>Kanban</span>
+        </button>
+        <button class="mob-nav-btn" data-view="timeline">
+          <span>⏳</span>
+          <span>Timeline</span>
+        </button>
+        <button class="mob-nav-btn" data-view="calendar">
+          <span>📅</span>
+          <span>Calendar</span>
+        </button>
+      </nav>
+
+    </main>
+
+  </div>
+
+  <!-- ================= FOCUS MODE DIM OVERLAY ================= -->
+  <div id="focus-overlay" class="focus-overlay-screen hidden">
+    <div class="focus-hud-bg"></div>
+    <div class="focus-card-wrapper">
+      <button id="focus-mode-exit" class="focus-exit-btn" title="Exit Focus Mode">Close Focus Mode</button>
+      
+      <div class="focus-radial-panel">
+        <div class="focus-pomo-clock">
+          <svg class="pomo-circle-svg" width="240" height="240">
+            <circle class="pomo-circle-bg" stroke="rgba(255, 255, 255, 0.03)" stroke-width="8" fill="transparent" r="100" cx="120" cy="120"/>
+            <circle id="pomo-circle-progress" class="pomo-circle-fill" stroke="var(--primary)" stroke-width="8" fill="transparent" r="100" cx="120" cy="120" stroke-linecap="round"/>
+          </svg>
+          <div class="clock-display">
+            <span id="focus-pomo-label" class="clock-label">FOCUS SESSION</span>
+            <span id="focus-pomo-timer" class="clock-timer">25:00</span>
+          </div>
+        </div>
+
+        <div class="breathing-circle-glow">
+          <div class="breath-bubble"></div>
+          <span class="breath-text">Inhale...</span>
+        </div>
+      </div>
+
+      <div class="focus-active-task-container">
+        <span class="focus-task-tag" id="focus-task-category">Work</span>
+        <h2 id="focus-task-title">Begin exploring your cosmos. Create a task!</h2>
+        <p id="focus-task-desc">No task currently set for warp focus.</p>
+        
+        <div class="focus-task-actions">
+          <button id="focus-task-complete-btn" class="primary-btn"><span>Complete Task & Obtain XP</span></button>
+          <button id="focus-pomo-play" class="hud-btn"><span>Pause Timer</span></button>
+        </div>
+      </div>
+
+      <div class="focus-audio-selector">
+        <span class="audio-label">Ambient Generator:</span>
+        <div class="audio-choices">
+          <button class="audio-btn active" data-sound="none">Mute</button>
+          <button class="audio-btn" data-sound="space">Deep Space Hum</button>
+          <button class="audio-btn" data-sound="rain">Cosmic Rain</button>
+          <button class="audio-btn" data-sound="lofi">Lofi Synth Wave</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TASK CREATOR MODAL PANEL ================= -->
+  <div id="task-modal" class="modal-overlay hidden">
+    <div class="modal-panel glass-box">
+      <div class="modal-header">
+        <h2 id="modal-title-text">Construct Star Task</h2>
+        <button class="close-modal-btn" id="close-task-modal-btn">×</button>
+      </div>
+      
+      <form id="task-form" class="modal-form">
+        <input type="hidden" id="edit-task-id">
+        
+        <div class="form-row">
+          <label for="task-title-input">Task Designation</label>
+          <input type="text" id="task-title-input" placeholder="e.g., Map gravitational core anomalies" required autocomplete="off">
+        </div>
+
+        <div class="form-row">
+          <label for="task-desc-input">Task Log (Description)</label>
+          <textarea id="task-desc-input" placeholder="Enter coordinates, notes, or deep insights..."></textarea>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="task-category-select">Category</label>
+            <select id="task-category-select">
+              <!-- JS will inject all active categories -->
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <label for="task-priority-select">Urgency Priority</label>
+            <select id="task-priority-select">
+              <option value="low">🌌 Low (Muted Orbit)</option>
+              <option value="medium">✨ Medium (Glowing Stellar)</option>
+              <option value="high">🔥 High (Supernova)</option>
+              <option value="critical">🚨 Critical (Black Hole Event)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="task-date-input">Warp Expiration (Due Date)</label>
+            <input type="date" id="task-date-input">
+          </div>
+          <div class="form-row">
+            <label for="task-time-input">Warp Clock (Due Time)</label>
+            <input type="time" id="task-time-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="task-recurrence-select">Orbital Recurrence (Repeat)</label>
+          <select id="task-recurrence-select">
+            <option value="none">None (Single Comet)</option>
+            <option value="daily">Daily Orbit</option>
+            <option value="weekly">Weekly Rotation</option>
+            <option value="monthly">Monthly Cycle</option>
+            <option value="yearly">Yearly Alignment</option>
+          </select>
+        </div>
+
+        <!-- Subtask Module -->
+        <div class="form-row subtask-manager-section">
+          <label>Sub-Orbits (Subtasks)</label>
+          <div class="subtask-input-wrap">
+            <input type="text" id="new-subtask-input" placeholder="Add orbital subtask...">
+            <button type="button" id="add-subtask-btn" class="hud-btn-mini">Inject</button>
+          </div>
+          <ul class="subtasks-creation-list" id="modal-subtasks-list">
+            <!-- Subtasks injected dynamically -->
+          </ul>
+        </div>
+
+        <!-- Attachment Module -->
+        <div class="form-row attachment-manager-section">
+          <label for="task-attachment-input">Star-Log Attachments</label>
+          <div class="file-input-wrapper">
+            <button type="button" class="hud-btn-mini file-btn">Select Space File Reference</button>
+            <input type="file" id="task-attachment-input" accept="image/*, application/pdf, text/plain">
+          </div>
+          <div class="attached-files-list" id="modal-attachments-list">
+            <!-- Files injected dynamically -->
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="cancel-task-btn"><span>Abort</span></button>
+          <button type="submit" class="primary-btn" id="submit-task-btn"><span>Initiate Star Task</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= CUSTOM CATEGORY CREATOR MODAL ================= -->
+  <div id="category-modal" class="modal-overlay hidden">
+    <div class="modal-panel glass-box modal-small">
+      <div class="modal-header">
+        <h2>Construct Custom Orbit (Category)</h2>
+        <button class="close-modal-btn" id="close-category-modal-btn">×</button>
+      </div>
+      <form id="category-form" class="modal-form">
+        <div class="form-row">
+          <label for="cat-name-input">Orbit Name</label>
+          <input type="text" id="cat-name-input" placeholder="e.g. Space Exploration" required>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="cat-icon-select">Emoji Emblem</label>
+            <select id="cat-icon-select">
+              <option value="🚀">🚀 Spaceship</option>
+              <option value="🧬">🧬 Science</option>
+              <option value="🌌">🌌 Galaxy</option>
+              <option value="💻">💻 Code</option>
+              <option value="🎨">🎨 Creative</option>
+              <option value="🏋️">🏋️ Physics/Gym</option>
+              <option value="🍕">🍕 Sustenance</option>
+              <option value="🪙">🪙 Gold</option>
+              <option value="📝">📝 Log</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="cat-color-input">Emblem Hue</label>
+            <input type="color" id="cat-color-input" value="#a855f7">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-btn" id="cancel-cat-btn"><span>Abort</span></button>
+          <button type="submit" class="primary-btn"><span>Form Category</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= THEME MODIFIER OVERLAY ================= -->
+  <div id="theme-modal" class="modal-overlay hidden">
+    <div class="modal-panel glass-box theme-panel-modal">
+      <div class="modal-header">
+        <h2>Dimensional Themes</h2>
+        <button class="close-modal-btn" id="close-theme-modal-btn">×</button>
+      </div>
+
+      <div class="theme-modal-layout">
+        <!-- Preset Themes -->
+        <div class="theme-section">
+          <h3>Galactic Presets</h3>
+          <div class="theme-presets-grid" id="theme-presets-list">
+            <!-- Dynamic button inserts by JS -->
+          </div>
+        </div>
+
+        <!-- Custom Theme Builder -->
+        <div class="theme-section custom-theme-builder-panel">
+          <h3>Custom Sector Colors</h3>
+          <div class="form-row">
+            <label for="custom-theme-primary">Warp Core Hue (Primary)</label>
+            <input type="color" id="custom-theme-primary" value="#8b5cf6">
+          </div>
+          <div class="form-row">
+            <label for="custom-theme-secondary">Warp Shield Hue (Secondary)</label>
+            <input type="color" id="custom-theme-secondary" value="#3b82f6">
+          </div>
+          <div class="form-row">
+            <label for="custom-theme-accent">Supernova Hue (Accent)</label>
+            <input type="color" id="custom-theme-accent" value="#f43f5e">
+          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="custom-theme-opacity">Glass Visibility</label>
+              <input type="range" id="custom-theme-opacity" min="0.05" max="0.9" step="0.05" value="0.15">
+            </div>
+            <div class="form-row">
+              <label for="custom-theme-intensity">Galaxy Noise Glow</label>
+              <input type="range" id="custom-theme-intensity" min="0.1" max="2" step="0.1" value="1.0">
+            </div>
+          </div>
+          <button id="apply-custom-theme-btn" class="primary-btn"><span>Inject Colors</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AETHER GOLD STORE MODAL ================= -->
+  <div id="shop-modal" class="modal-overlay hidden">
+    <div class="modal-panel glass-box shop-panel-modal">
+      <div class="modal-header">
+        <h2>Aether Gold Store</h2>
+        <div class="shop-balance-indicator">🪙 Balance: <span id="shop-gold-val">500</span>g</div>
+        <button class="close-modal-btn" id="close-shop-modal-btn">×</button>
+      </div>
+      
+      <div class="shop-grid" id="shop-items-container">
+        <!-- Injected dynamic store purchase widgets (themes, sound profiles, special avatars) by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SYSTEM NOTIFICATIONS & TOAST OVERLAYS ================= -->
+  <div id="toast-wrapper" class="toast-wrapper" aria-live="polite"></div>
+
+  <!-- Achievement Announcement Screen Overlay -->
+  <div id="achievement-celebration" class="achievement-celebration-modal hidden">
+    <div class="ach-glow-circle"></div>
+    <div class="ach-box">
+      <span class="ach-star-burst">⭐</span>
+      <span class="ach-milestone-title">GALACTIC ACHIEVEMENT LOCKED</span>
+      <h2 id="ach-popup-name">Productivity Hero</h2>
+      <p id="ach-popup-desc">Complete 10 tasks in active orbit.</p>
+      <div class="ach-reward-badge">🪙 +200 Aether Gold Awarded</div>
+    </div>
+  </div>
+
+</body>
+</html>
